@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <group id="Folder Repository, directory=, recursive=true, Auto-Update=true, version=2" prefer="public" xml:base="">
+        <uri id="Automatically generated entry, Timestamp=1606217627821" name="http://swat.cse.lehigh.edu/onto/univ-bench.owl" uri="lubm.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1606217627821" name="http://www.semanticweb.org/chrumka/ontologies/2020/4/untitled-ontology-13" uri="family2.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1606217627821" name="http://www.semanticweb.org/julia/ontologies/2017/8/family" uri="family.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1606217627821" name="http://www.semanticweb.org/katka/ontologies/2018/10/academy" uri="academy.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1606217627821" name="http://www.semanticweb.org/katka/ontologies/2018/9/katka" uri="test.owl"/>
+    </group>
+</catalog>
