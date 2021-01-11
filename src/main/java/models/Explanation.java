@@ -21,6 +21,7 @@ public class Explanation {
     public Explanation(Collection<OWLAxiom> owlAxioms, Integer depth, double acquireTime) {
         this.owlAxioms = new LinkedList<>(owlAxioms);
         this.depth = depth;
+        this.acquireTime = acquireTime;
     }
 
     public Explanation() {

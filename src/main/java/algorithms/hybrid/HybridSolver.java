@@ -46,6 +46,8 @@ public class HybridSolver implements ISolver {
     private List<OWLAxiom> path;
     private Abducibles abducibles;
 
+    List<OWLAxiom> lenghtOneExplanations = new ArrayList<>();
+
     private int lastUsableModelIndex;
     private OWLAxiom negObservation;
 
@@ -217,6 +219,8 @@ public class HybridSolver implements ISolver {
                         }
                     }
                     modelNode.depth = model.depth + 1;
+                    modelNode.add_node_explanations(model);
+                    modelNode.add_to_explanations(lenghtOneExplanations);
                     queue.add(modelNode);
                     path.clear();
                 }
@@ -241,9 +245,11 @@ public class HybridSolver implements ISolver {
 
     private List<Explanation> findExplanations(){
         abd_literals.removeLiterals(path);
+        abd_literals.removeLiterals(lenghtOneExplanations);
         Conflict conflict = findConflicts(abd_literals);
 //        Conflict conflict = findConflicts(literals);
         abd_literals.addLiterals(path);
+        abd_literals.addLiterals(lenghtOneExplanations);
         return conflict.getExplanations();
     }
 
@@ -427,8 +433,7 @@ public class HybridSolver implements ISolver {
         ModelNode negModelNode = new ModelNode();
         List<OWLAxiom> negModel = new LinkedList<>();
         ModelNode modelNode = new ModelNode();
-        List<OWLAxiom> model = new LinkedList<>();
-        modelNode.data = model;
+        modelNode.data = new LinkedList<>();
 
         if (path != null) {
             path.remove(negObservation);
@@ -556,9 +561,7 @@ public class HybridSolver implements ISolver {
     public static Set<OWLClassExpression> classSet2classExpSet(Set<OWLClass> classSet) {
         //transforms each class into (superclass) class expression
         Set<OWLClassExpression> toReturn = new HashSet<OWLClassExpression>();
-        for (OWLClassExpression classExp : classSet) {
-            toReturn.add(classExp);
-        }
+        toReturn.addAll(classSet);
         return toReturn;
     }
 
@@ -574,12 +577,17 @@ public class HybridSolver implements ISolver {
 
     private boolean addNewExplanations(){
         List<Explanation> newExplanations = findExplanations();
-        List<OWLAxiom> lenghtOneExplanations = new ArrayList<>();
+        lenghtOneExplanations = new ArrayList<>();
+        int not_an_explanation_count = 0;
         for (Explanation conflict : newExplanations){
             if (conflict.getOwlAxioms().size() == 1){
                 lenghtOneExplanations.add(Iterables.get(conflict.getOwlAxioms(), 0));
             }
             conflict.addAxioms(path);
+            if (!isExplanation(conflict)){
+                not_an_explanation_count++;
+                continue;
+            }
             if (isMinimal(explanations, conflict)){
                 conflict.setDepth(conflict.getOwlAxioms().size());
                 explanations.add(conflict);
@@ -588,7 +596,7 @@ public class HybridSolver implements ISolver {
 //        literals.removeLiterals(lenghtOneExplanations);
 //        boolean allExplanationsFound = literals.getOwlAxioms().size() <= 1;
 //        literals.addLiterals(lenghtOneExplanations);
-        if (newExplanations.size() == lenghtOneExplanations.size()){
+        if (newExplanations.size() - not_an_explanation_count == this.lenghtOneExplanations.size()){
             return false;
         }
         return !newExplanations.isEmpty(); // && !allExplanationsFound;
