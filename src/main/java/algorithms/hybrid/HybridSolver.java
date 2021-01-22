@@ -239,7 +239,6 @@ public class HybridSolver implements ISolver {
             return new Conflict();
         }
         abd_literals.removeLiterals(path); // nevraciam cestu naspat? mam ju vobec davat prec?
-//        return findConflicts(literals);
         return findConflicts(abd_literals);
     }
 
@@ -247,7 +246,6 @@ public class HybridSolver implements ISolver {
         abd_literals.removeLiterals(path);
         abd_literals.removeLiterals(lenghtOneExplanations);
         Conflict conflict = findConflicts(abd_literals);
-//        Conflict conflict = findConflicts(literals);
         abd_literals.addLiterals(path);
         abd_literals.addLiterals(lenghtOneExplanations);
         return conflict.getExplanations();
@@ -578,16 +576,11 @@ public class HybridSolver implements ISolver {
     private boolean addNewExplanations(){
         List<Explanation> newExplanations = findExplanations();
         lenghtOneExplanations = new ArrayList<>();
-        int not_an_explanation_count = 0;
         for (Explanation conflict : newExplanations){
             if (conflict.getOwlAxioms().size() == 1){
                 lenghtOneExplanations.add(Iterables.get(conflict.getOwlAxioms(), 0));
             }
             conflict.addAxioms(path);
-            if (!isExplanation(conflict)){
-                not_an_explanation_count++;
-                continue;
-            }
             if (isMinimal(explanations, conflict)){
                 conflict.setDepth(conflict.getOwlAxioms().size());
                 explanations.add(conflict);
@@ -596,7 +589,7 @@ public class HybridSolver implements ISolver {
 //        literals.removeLiterals(lenghtOneExplanations);
 //        boolean allExplanationsFound = literals.getOwlAxioms().size() <= 1;
 //        literals.addLiterals(lenghtOneExplanations);
-        if (newExplanations.size() - not_an_explanation_count == this.lenghtOneExplanations.size()){
+        if (newExplanations.size() == this.lenghtOneExplanations.size()){
             return false;
         }
         return !newExplanations.isEmpty(); // && !allExplanationsFound;
