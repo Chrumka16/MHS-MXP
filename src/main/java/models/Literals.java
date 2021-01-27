@@ -41,7 +41,11 @@ public class Literals {
         owlAxioms.removeAll(literals);
     }
 
+    public void removeLiteral(OWLAxiom literal) {owlAxioms.remove(literal); }
+
     public void addLiterals(List<OWLAxiom> literals){
         owlAxioms.addAll(literals);
     }
+
+    public boolean contains(OWLAxiom axiom) {return owlAxioms.contains(axiom);}
 }

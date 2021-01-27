@@ -96,6 +96,13 @@ public class ArgumentParser {
                         add_prefix(next + " " + last);
                     }
                     break;
+                case "-n:":
+                    if (next.equals("false")) {
+                        Configuration.NEGATION_ALLOWED = false;
+                    } else if (!next.equals("true")) {
+                        System.err.println("Wrong negation allowed value -n" + next + ", allowed values are 'true' and 'false'");
+                    }
+                    break;
                 default:
                     System.err.println("Unknown option " + line[0] + " in input file");
                     Application.finish(ExitCode.ERROR);

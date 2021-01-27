@@ -12,4 +12,5 @@ public class Configuration {
     public static Long TIMEOUT;
     public static ArrayList<String> ABDUCIBLES = new ArrayList<>();
     public static ArrayList<String> PREFIXES = new ArrayList<>();
+    public static boolean NEGATION_ALLOWED = true;
 }

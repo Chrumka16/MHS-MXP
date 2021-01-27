@@ -116,15 +116,34 @@ public class HybridSolver implements ISolver {
         allLiterals.remove(loader.getObservation().getOwlAxiom());
         literals = new Literals(allLiterals);
         Set<OWLAxiom> to_abd = new HashSet<>();
-        for (OWLAxiom ax : allLiterals){
-            if (abducibles.getIndividuals().containsAll(ax.getIndividualsInSignature()) &&
-            abducibles.getClasses().containsAll(ax.getClassesInSignature())){
-                to_abd.add(ax);
+        if (Configuration.NEGATION_ALLOWED){
+            for (OWLAxiom ax : allLiterals){
+                if (abducibles.getIndividuals().containsAll(ax.getIndividualsInSignature()) &&
+                        abducibles.getClasses().containsAll(ax.getClassesInSignature())){
+                    to_abd.add(ax);
+                }
+            }
+        }
+        else {
+            for (OWLAxiom ax : assertionsAxioms){
+                if (ax.equals(loader.getObservation().getOwlAxiom())){
+                    continue;
+                }
+                if (abducibles.getIndividuals().containsAll(ax.getIndividualsInSignature()) &&
+                        abducibles.getClasses().containsAll(ax.getClassesInSignature())){
+                    to_abd.add(ax);
+                }
             }
         }
         abd_literals = new Literals(to_abd);
         if (abd_literals.getOwlAxioms().isEmpty()){
-            abd_literals = literals;
+            if (Configuration.NEGATION_ALLOWED){
+                abd_literals = literals;        // ok??
+            }
+            else{
+                abd_literals.addLiterals(assertionsAxioms);
+                abd_literals.removeLiteral(loader.getObservation().getOwlAxiom());
+            }
         }
     }
 
@@ -141,7 +160,7 @@ public class HybridSolver implements ISolver {
             e.setDepth(e.getOwlAxioms().size());
         }
         explanations = conflict.getExplanations();
-        showExplanationsWithDepth(1, false);
+//        showExplanationsWithDepth(1, false);
 
         ModelNode root = new ModelNode();
         if (usableModelInModels()){
@@ -182,6 +201,11 @@ public class HybridSolver implements ISolver {
                             child.equals(loader.getObservation().getOwlAxiom())){
                         continue;
                     }
+
+                    if (!abd_literals.contains(child)){
+                        continue;
+                    }
+
                     Explanation explanation = new Explanation();
 
                     explanation.addAxioms(model.label);
@@ -238,7 +262,7 @@ public class HybridSolver implements ISolver {
         if (reasonerManager.isOntologyWithLiteralsConsistent(literals.getOwlAxioms(), ontology)) {
             return new Conflict();
         }
-        abd_literals.removeLiterals(path); // nevraciam cestu naspat? mam ju vobec davat prec?
+//        abd_literals.removeLiterals(path); // nevraciam cestu naspat? mam ju vobec davat prec?
         return findConflicts(abd_literals);
     }
 

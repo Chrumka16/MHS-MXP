@@ -1,5 +1,5 @@
 -f: C:\Users\gabli\Desktop\Diplomovka\hybrid_solver\files\family.owl
--o: jack:Father
+-o: fam:Father(fam:jack)
 -p: {
 fam: http://www.semanticweb.org/julia/ontologies/2017/8/family#
 }
@@ -12,4 +12,5 @@ http://www.semanticweb.org/julia/ontologies/2017/8/family#Mother
 -a: http://www.semanticweb.org/julia/ontologies/2017/8/family#jack
 -a: http://www.semanticweb.org/julia/ontologies/2017/8/family#Grandfather
 -a: fam:Female
+-a: fam:GrandFather
 
