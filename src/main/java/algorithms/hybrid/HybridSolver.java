@@ -673,6 +673,9 @@ public class HybridSolver implements ISolver {
             List<Explanation> currentExplanations = removeExplanationsWithDepth(filteredExplanations, depth);
             filterIfNotMinimal(currentExplanations);
             if (currentExplanations.isEmpty()) {
+                if (level_times.size() < depth) {
+                    level_times.add(null);
+                }
                 depth++;
                 continue;
             }
