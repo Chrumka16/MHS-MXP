@@ -186,7 +186,7 @@ public class HybridSolver implements ISolver {
                 break;
             }
 
-            if (node.depth > currentDepth){
+            if (node.depth > currentDepth && currentDepth > 0){
                 showExplanationsWithDepth(currentDepth, false);
                 currentDepth++;
             }
@@ -676,9 +676,12 @@ public class HybridSolver implements ISolver {
                 depth++;
                 continue;
             }
+            if (level_times.size() < depth){
+                level_times.add(find_level_time(currentExplanations));
+            }
             minimalExplanations.addAll(currentExplanations);
             String currentExplanationsFormat = StringUtils.join(currentExplanations, ",");
-            String line = String.format("%d;%d;%.2f;{%s}\n", depth, currentExplanations.size(), level_times.get(depth), currentExplanationsFormat);
+            String line = String.format("%d;%d;%.2f;{%s}\n", depth, currentExplanations.size(), level_times.get(depth-1), currentExplanationsFormat);
             System.out.print(line);
             result.append(line);
             depth++;
@@ -686,6 +689,16 @@ public class HybridSolver implements ISolver {
         log_explanations_times(minimalExplanations);
 
         FileLogger.appendToFile(FileLogger.HYBRID_LOG_FILE__PREFIX, currentTimeMillis, result.toString());
+    }
+
+    private double find_level_time(List<Explanation> explanations){
+        double time = 0;
+        for (Explanation exp: explanations){
+            if (exp.getAcquireTime() > time){
+                time = exp.getAcquireTime();
+            }
+        }
+        return time;
     }
 
     private void log_explanations_times(List<Explanation> explanations){
