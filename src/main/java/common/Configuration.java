@@ -6,7 +6,8 @@ import java.util.ArrayList;
 
 public class Configuration {
     public static String OBSERVATION = "";
-    public static String INPUT_FILE = "";
+    public static String INPUT_ONT_FILE = "";
+    public static String INPUT_FILE_NAME = "";
     public static ReasonerType REASONER;
     public static Integer DEPTH;
     public static Long TIMEOUT;

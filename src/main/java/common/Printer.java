@@ -12,9 +12,10 @@ public class Printer {
 
     public static String print(OWLAxiom owlAxiom) {
         if (owlAxiom instanceof OWLClassAssertionAxiom) {
-            return Printer.getNamedIndividual(owlAxiom).concat(DLSyntax.DELIMITER_ASSERTION).concat(Printer.getClassAssertionAxiom(owlAxiom));
+            return Printer.getClassAssertionAxiom(owlAxiom).concat(DLSyntax.LEFT_PARENTHESES).
+                    concat(Printer.getNamedIndividual(owlAxiom)).concat(DLSyntax.RIGHT_PARENTHESES);
+//            return Printer.getNamedIndividual(owlAxiom).concat(DLSyntax.DELIMITER_ASSERTION).concat(Printer.getClassAssertionAxiom(owlAxiom));
         }
-
         return Printer.getObjectPropertyAssertionAxiom(owlAxiom);
     }
 
@@ -81,6 +82,6 @@ public class Printer {
             }
         }
 
-        return subject.concat(DLSyntax.DELIMITER_OBJECT_PROPERTY).concat(object).concat(DLSyntax.DELIMITER_ASSERTION).concat(property);
+        return property.concat(DLSyntax.LEFT_PARENTHESES).concat(subject).concat(DLSyntax.DELIMITER_OBJECT_PROPERTY).concat(object).concat(DLSyntax.RIGHT_PARENTHESES);
     }
 }

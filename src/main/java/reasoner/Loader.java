@@ -51,8 +51,8 @@ public class Loader implements ILoader {
     private void loadReasoner(ReasonerType reasonerType) {
         try {
             ontologyManager = OWLManager.createOWLOntologyManager();
-            ontology = ontologyManager.loadOntologyFromOntologyDocument(new File(Configuration.INPUT_FILE));
-            originalOntology = OWLManager.createOWLOntologyManager().loadOntologyFromOntologyDocument(new File(Configuration.INPUT_FILE));
+            ontology = ontologyManager.loadOntologyFromOntologyDocument(new File(Configuration.INPUT_ONT_FILE));
+            originalOntology = OWLManager.createOWLOntologyManager().loadOntologyFromOntologyDocument(new File(Configuration.INPUT_ONT_FILE));
 
             changeReasoner(reasonerType);
             initializeReasoner();

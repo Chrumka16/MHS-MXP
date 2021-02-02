@@ -16,7 +16,7 @@ public class AxiomManager {
 
         if (OWLDeclarationAxiom.class.isAssignableFrom(axiom.getClass()) && OWLClass.class.isAssignableFrom(((OWLDeclarationAxiom) axiom).getEntity().getClass())) {
             String name = ((OWLDeclarationAxiom) axiom).getEntity().getIRI().getFragment();
-            OWLClass owlClass = loader.getDataFactory().getOWLClass(IRI.create(loader.getOntologyIRI().concat(DLSyntax.DELIMITER_ONTOLOGY).concat(name)));
+            OWLClass owlClass = loader.getDataFactory().getOWLClass(((OWLDeclarationAxiom) axiom).getEntity().getIRI());
 
             String className = Printer.getClassAssertionAxiom(loader.getObservation().getOwlAxiom());
             boolean containsNegation = className.contains(DLSyntax.DISPLAY_NEGATION);

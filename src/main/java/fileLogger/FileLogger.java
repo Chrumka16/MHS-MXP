@@ -12,14 +12,15 @@ import java.nio.file.StandardOpenOption;
 public class FileLogger {
 
     public static final String HYBRID_LOG_FILE__PREFIX = "hybrid";
-    public static final String HYBRID_PARTIAL_EXPLANATIONS_LOG_FILE__PREFIX = "hybridPartialExplanations";
+    public static final String HYBRID_EXP_TIMES_LOG_FILE__PREFIX = "hybrid_explanation_times";
+    public static final String HYBRID_PARTIAL_EXPLANATIONS_LOG_FILE__PREFIX = "hybrid_partial_explanations";
     public static final String LOG_FILE__POSTFIX = ".log";
     private static final String FILE_DIRECTORY = "logs";
 
-    public static void appendToFile(String fileName, long currentTimeMillis, String log, boolean isOutput) {
-        createFileIfNotExists(fileName, currentTimeMillis, isOutput);
+    public static void appendToFile(String fileName, long currentTimeMillis, String log) {
+        createFileIfNotExists(fileName, currentTimeMillis);
         try {
-            String file_path = getFilePath(fileName, currentTimeMillis, isOutput);
+            String file_path = getFilePath(fileName, currentTimeMillis);
             System.out.println(Paths.get(file_path));
             Files.write(Paths.get(file_path), log.getBytes(), StandardOpenOption.APPEND);
         } catch (IOException exception) {
@@ -27,8 +28,8 @@ public class FileLogger {
         }
     }
 
-    private static void createFileIfNotExists(String fileName, long currentTimeMillis, boolean isOutput) {
-        File file = new File(getFilePath(fileName, currentTimeMillis, isOutput));
+    private static void createFileIfNotExists(String fileName, long currentTimeMillis) {
+        File file = new File(getFilePath(fileName, currentTimeMillis));
         try {
             file.createNewFile();
         } catch (IOException exception) {
@@ -36,13 +37,13 @@ public class FileLogger {
         }
     }
 
-    private static String getFilePath(String fileName, long currentTimeMillis, boolean isOutput) {
+    private static String getFilePath(String fileName, long currentTimeMillis) {
         String[] inputFile;
         try {
-            inputFile = Configuration.INPUT_FILE.split(File.separator);
+            inputFile = Configuration.INPUT_ONT_FILE.split(File.separator);
         }
         catch(Exception e) {
-            inputFile = Configuration.INPUT_FILE.split("\\\\");
+            inputFile = Configuration.INPUT_ONT_FILE.split("\\\\");
         }
         String input = inputFile[inputFile.length - 1];
         String inputFileName = input;
@@ -51,23 +52,15 @@ public class FileLogger {
             inputFileName = inputFileParts[0];
         }
         String directoryPath;
-        if (isOutput){
-            directoryPath = "outputs".concat(File.separator).concat(Configuration.REASONER.name()).concat(File.separator).concat(inputFileName);
-        }
-        else {
-           directoryPath = FILE_DIRECTORY.concat(File.separator).concat(Configuration.REASONER.name()).concat(File.separator).concat(inputFileName);
-        }
+        directoryPath = FILE_DIRECTORY.concat(File.separator).concat(Configuration.REASONER.name()).concat(File.separator).concat(inputFileName);
         File directory = new File(directoryPath);
         if (!directory.exists()) {
             directory.mkdirs();
         }
 
 //        String observation = Configuration.OBSERVATION.replaceAll("\\s+", "_").replaceAll(":", "-");
-        String observation = observationToFilePath();
-        if (isOutput){
-            return directoryPath.concat(File.separator).concat("" + currentTimeMillis + "__").concat(observation + "__").concat(fileName).concat(".txt");
-        }
-        return directoryPath.concat(File.separator).concat("" + currentTimeMillis + "__").concat(observation + "__").concat(fileName).concat(LOG_FILE__POSTFIX);
+//        String observation = observationToFilePath();
+        return directoryPath.concat(File.separator).concat("" + currentTimeMillis + "__").concat(Configuration.INPUT_FILE_NAME + "__").concat(fileName).concat(LOG_FILE__POSTFIX);
     }
 
     private static String observationToFilePath(){

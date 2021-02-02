@@ -5,8 +5,6 @@ import application.ExitCode;
 import reasoner.ReasonerType;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 
 
@@ -18,6 +16,7 @@ public class ArgumentParser {
             System.err.println("Wrong number of argument for main function: Run program with one configuration input file as argument");
             Application.finish(ExitCode.ERROR);
         }
+        Configuration.INPUT_FILE_NAME = new File(args[0]).getName().split("\\.")[0];
         ArrayList<String[]> lines = read_input_file(args[0]);
 
         boolean read_abd = false;
@@ -44,7 +43,7 @@ public class ArgumentParser {
                         System.err.println("Could not open -f file " + next);
                         Application.finish(ExitCode.ERROR);
                     }
-                    Configuration.INPUT_FILE = next;
+                    Configuration.INPUT_ONT_FILE = next;
                     break;
                 case "-o:":
 //                    if (!next.matches("[a-zA-Z]+:[a-zA-Z]+")){
@@ -108,7 +107,7 @@ public class ArgumentParser {
                     Application.finish(ExitCode.ERROR);
             }
         }
-        if (Configuration.INPUT_FILE.equals("") || Configuration.OBSERVATION.equals("")){
+        if (Configuration.INPUT_ONT_FILE.equals("") || Configuration.OBSERVATION.equals("")){
             System.err.println("Input file -f and observation -o are both required argument");
             Application.finish(ExitCode.ERROR);
         }

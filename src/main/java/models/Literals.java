@@ -47,5 +47,5 @@ public class Literals {
         owlAxioms.addAll(literals);
     }
 
-    public boolean contains(OWLAxiom axiom) {return owlAxioms.contains(axiom);}
+    public boolean contains(OWLAxiom axiom) { return owlAxioms.contains(axiom); }
 }

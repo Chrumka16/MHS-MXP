@@ -39,6 +39,8 @@ public class Explanation {
 
     public double getAcquireTime() { return acquireTime; }
 
+    public void setAcquireTime(double time) { this.acquireTime = time; }
+
     public void setDepth(Integer depth) {
         this.depth = depth;
     }

@@ -20,5 +20,5 @@ public class DLSyntax {
 
     public final static String DISPLAY_NEGATION = "¬";
 
-    public final static String IRI_REGEX = "\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
+    public final static String IRI_REGEX = "[a-z]*:[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
 }

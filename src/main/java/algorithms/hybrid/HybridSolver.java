@@ -57,6 +57,8 @@ public class HybridSolver implements ISolver {
     private boolean REUSE_OF_MODELS = true;
     private boolean GET_MODELS_BY_REASONER = false;
 
+    private List<Double> level_times = new ArrayList<Double>();
+
     public HybridSolver(ThreadTimes threadTimes, long currentTimeMillis) {
         this.threadTimes = threadTimes;
         this.currentTimeMillis = currentTimeMillis;
@@ -210,6 +212,7 @@ public class HybridSolver implements ISolver {
 
                     explanation.addAxioms(model.label);
                     explanation.addAxiom(child);
+                    explanation.setAcquireTime(threadTimes.getTotalUserTimeInSec());
 
                     path = new ArrayList<>(explanation.getOwlAxioms());
 
@@ -368,7 +371,7 @@ public class HybridSolver implements ISolver {
     }
 
     private String getClassName(OWLAxiom axiom) {
-        return Printer.print(axiom).split(DLSyntax.DELIMITER_ASSERTION)[1];
+        return Printer.print(axiom).split("\\" + DLSyntax.LEFT_PARENTHESES)[0];
     }
 
     private boolean containsNegation(String name) {
@@ -661,7 +664,6 @@ public class HybridSolver implements ISolver {
 
     private void showExplanations() {
         StringBuilder result = new StringBuilder();
-        StringBuilder outputResult = new StringBuilder();
         List<Explanation> filteredExplanations = filterExplanations();
         path.clear();
         minimalExplanations = new LinkedList<>();
@@ -676,16 +678,23 @@ public class HybridSolver implements ISolver {
             }
             minimalExplanations.addAll(currentExplanations);
             String currentExplanationsFormat = StringUtils.join(currentExplanations, ",");
-            String line = String.format("%d;%d;%.2f;{%s}\n", depth, currentExplanations.size(), threadTimes.getTotalUserTimeInSec(), currentExplanationsFormat);
-            String outputLine = String.format("{%s}\n", currentExplanationsFormat);
+            String line = String.format("%d;%d;%.2f;{%s}\n", depth, currentExplanations.size(), level_times.get(depth), currentExplanationsFormat);
             System.out.print(line);
             result.append(line);
-            outputResult.append(outputLine);
             depth++;
         }
+        log_explanations_times(minimalExplanations);
 
-        FileLogger.appendToFile(FileLogger.HYBRID_LOG_FILE__PREFIX, currentTimeMillis, result.toString(), false);
-        FileLogger.appendToFile(FileLogger.HYBRID_LOG_FILE__PREFIX, currentTimeMillis, outputResult.toString(), true);
+        FileLogger.appendToFile(FileLogger.HYBRID_LOG_FILE__PREFIX, currentTimeMillis, result.toString());
+    }
+
+    private void log_explanations_times(List<Explanation> explanations){
+        StringBuilder result = new StringBuilder();
+        for (Explanation exp: explanations){
+            String line = String.format("%.2f;%s\n", exp.getAcquireTime(), exp);
+            result.append(line);
+        }
+        FileLogger.appendToFile(FileLogger.HYBRID_EXP_TIMES_LOG_FILE__PREFIX, currentTimeMillis, result.toString());
     }
 
     private void filterIfNotMinimal(List<Explanation> explanations){
@@ -709,9 +718,11 @@ public class HybridSolver implements ISolver {
     private void showExplanationsWithDepth(Integer depth, boolean timeout) {
         List<Explanation> currentExplanations = explanations.stream().filter(explanation -> explanation.getDepth().equals(depth)).collect(Collectors.toList());
         String currentExplanationsFormat = StringUtils.join(currentExplanations, ",");
-        String line = String.format("%d;%d;%.2f%s;{%s}\n", depth, currentExplanations.size(), threadTimes.getTotalUserTimeInSec(), timeout ? "-TIMEOUT" : "", currentExplanationsFormat);
+        Double time = threadTimes.getTotalUserTimeInSec();
+        level_times.add(time);
+        String line = String.format("%d;%d;%.2f%s;{%s}\n", depth, currentExplanations.size(), time, timeout ? "-TIMEOUT" : "", currentExplanationsFormat);
         System.out.print(line);
-        FileLogger.appendToFile(FileLogger.HYBRID_PARTIAL_EXPLANATIONS_LOG_FILE__PREFIX, currentTimeMillis, line, false);
+        FileLogger.appendToFile(FileLogger.HYBRID_PARTIAL_EXPLANATIONS_LOG_FILE__PREFIX, currentTimeMillis, line);
     }
 
     private List<Explanation> filterExplanations() {
