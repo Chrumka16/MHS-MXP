@@ -186,7 +186,7 @@ public class HybridSolver implements ISolver {
                 break;
             }
 
-            if (node.depth > currentDepth && currentDepth > 0){
+            if (node.depth > currentDepth){
                 showExplanationsWithDepth(currentDepth, false);
                 currentDepth++;
             }
