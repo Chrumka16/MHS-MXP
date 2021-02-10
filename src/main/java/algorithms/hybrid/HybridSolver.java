@@ -57,7 +57,7 @@ public class HybridSolver implements ISolver {
     private boolean REUSE_OF_MODELS = true;
     private boolean GET_MODELS_BY_REASONER = false;
 
-    private List<Double> level_times = new ArrayList<Double>();
+    private Map<Integer, Double> level_times = new HashMap<>();
 
     public HybridSolver(ThreadTimes threadTimes, long currentTimeMillis) {
         this.threadTimes = threadTimes;
@@ -673,18 +673,15 @@ public class HybridSolver implements ISolver {
             List<Explanation> currentExplanations = removeExplanationsWithDepth(filteredExplanations, depth);
             filterIfNotMinimal(currentExplanations);
             if (currentExplanations.isEmpty()) {
-                if (level_times.size() < depth) {
-                    level_times.add(null);
-                }
                 depth++;
                 continue;
             }
-            if (level_times.size() < depth){
-                level_times.add(find_level_time(currentExplanations));
+            if (!level_times.containsKey(depth)){
+                level_times.put(depth, find_level_time(currentExplanations));
             }
             minimalExplanations.addAll(currentExplanations);
             String currentExplanationsFormat = StringUtils.join(currentExplanations, ",");
-            String line = String.format("%d;%d;%.2f;{%s}\n", depth, currentExplanations.size(), level_times.get(depth-1), currentExplanationsFormat);
+            String line = String.format("%d;%d;%.2f;{%s}\n", depth, currentExplanations.size(), level_times.get(depth), currentExplanationsFormat);
             System.out.print(line);
             result.append(line);
             depth++;
@@ -735,7 +732,7 @@ public class HybridSolver implements ISolver {
         List<Explanation> currentExplanations = explanations.stream().filter(explanation -> explanation.getDepth().equals(depth)).collect(Collectors.toList());
         String currentExplanationsFormat = StringUtils.join(currentExplanations, ",");
         Double time = threadTimes.getTotalUserTimeInSec();
-        level_times.add(time);
+        level_times.put(depth, time);
         String line = String.format("%d;%d;%.2f%s;{%s}\n", depth, currentExplanations.size(), time, timeout ? "-TIMEOUT" : "", currentExplanationsFormat);
         System.out.print(line);
         FileLogger.appendToFile(FileLogger.HYBRID_PARTIAL_EXPLANATIONS_LOG_FILE__PREFIX, currentTimeMillis, line);
