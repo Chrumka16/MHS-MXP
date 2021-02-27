@@ -81,8 +81,8 @@ public class HybridSolver implements ISolver {
     }
 
     private void initialize() {
-        models = new ArrayList<ModelNode>();
-        negModels = new ArrayList<ModelNode>();
+        models = new ArrayList<>();
+        negModels = new ArrayList<>();
 
         assertionsAxioms = new ArrayList<>();
         negAssertionsAxioms = new ArrayList<>();
@@ -425,7 +425,7 @@ public class HybridSolver implements ISolver {
             }
         }
         removeAxiomsFromOntology(path);
-        modelNode.data = new LinkedList<OWLAxiom>();
+        modelNode.data = new LinkedList<>();
         for (OWLAxiom axiom: model){
             if (abducibles.getIndividuals().containsAll(axiom.individualsInSignature().collect(Collectors.toList())) &&
                     abducibles.getClasses().containsAll( axiom.classesInSignature().collect(Collectors.toList()))){
@@ -471,19 +471,19 @@ public class HybridSolver implements ISolver {
 
         OWLDataFactory dfactory = OWLManager.createOWLOntologyManager().getOWLDataFactory();
 
-        ArrayList<OWLNamedIndividual> individualArray = new ArrayList<OWLNamedIndividual>(ontology.getIndividualsInSignature());
-        Set<OWLAxiom> negModelSet = new HashSet<OWLAxiom>();
-        Set<OWLAxiom> modelSet = new HashSet<OWLAxiom>();
+        ArrayList<OWLNamedIndividual> individualArray = new ArrayList<>(ontology.getIndividualsInSignature());
+        Set<OWLAxiom> negModelSet = new HashSet<>();
+        Set<OWLAxiom> modelSet = new HashSet<>();
 
         for (OWLNamedIndividual ind : individualArray) {
             /***********************
              class assertion axioms
              ***********************/
-
             if (!abducibles.getIndividuals().contains(ind)){
                 continue;
             }
 
+//            System.out.println(ind);
 
             Set<OWLClassExpression> ontologyTypes =  //type assertions mentioned in ontology
                     EntitySearcher.getTypes(ind, ontology).collect(toSet());
@@ -522,8 +522,15 @@ public class HybridSolver implements ISolver {
                 }
                 OWLClassExpression negClassExp = classExpression.getComplementNNF();
                 OWLAxiom axiom = dfactory.getOWLClassAssertionAxiom(negClassExp, ind);
+//                System.out.println(axiom);
+//                System.out.println(abd_literals);
                 negModelSet.add(axiom);
                 modelSet.add(dfactory.getOWLClassAssertionAxiom(classExpression, ind));
+//                if (abd_literals.contains(axiom)) {
+//                    System.out.println("found");
+//                    System.out.println(ind);
+//                    System.out.println(axiom);
+//                }
             }
             for (OWLClassExpression classExpression : newNotTypes) {
                 if (!abducibles.getClasses().contains(classExpression)){
@@ -562,8 +569,8 @@ public class HybridSolver implements ISolver {
         }
 
         removeAxiomsFromOntology(path);
-        modelNode.data = new LinkedList<OWLAxiom>(modelSet);
-        negModelNode.data = new LinkedList<OWLAxiom>(negModelSet);
+        modelNode.data = new LinkedList<>(modelSet);
+        negModelNode.data = new LinkedList<>(negModelSet);
         lastUsableModelIndex = models.indexOf(modelNode);
         if (!modelNode.data.isEmpty() && lastUsableModelIndex == -1) {
             lastUsableModelIndex = models.size();
@@ -575,7 +582,7 @@ public class HybridSolver implements ISolver {
 
     public static Set<OWLClassExpression> nodeClassSet2classExpSet(Set<Node<OWLClass>> nodeList) {
         //node is returned from reasoner model
-        Set<OWLClassExpression> toReturn = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> toReturn = new HashSet<>();
         for (Node<OWLClass> node : nodeList) {
             //node
             toReturn.addAll(node.getEntitiesMinusTop());
@@ -585,7 +592,7 @@ public class HybridSolver implements ISolver {
 
     public static Set<OWLClassExpression> classSet2classExpSet(Set<OWLClass> classSet) {
         //transforms each class into (superclass) class expression
-        Set<OWLClassExpression> toReturn = new HashSet<OWLClassExpression>();
+        Set<OWLClassExpression> toReturn = new HashSet<>();
         toReturn.addAll(classSet);
         return toReturn;
     }

@@ -11,7 +11,8 @@ public class Configuration {
     public static ReasonerType REASONER;
     public static Integer DEPTH;
     public static Long TIMEOUT;
-    public static ArrayList<String> ABDUCIBLES = new ArrayList<>();
+    public static ArrayList<String> ABDUCIBLES_CONCEPTS = new ArrayList<>();
+    public static ArrayList<String> ABDUCIBLES_INDIVIDUALS = new ArrayList<>();
     public static ArrayList<String> PREFIXES = new ArrayList<>();
     public static boolean NEGATION_ALLOWED = true;
 }

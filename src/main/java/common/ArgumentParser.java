@@ -19,17 +19,21 @@ public class ArgumentParser {
         Configuration.INPUT_FILE_NAME = new File(args[0]).getName().split("\\.")[0];
         ArrayList<String[]> lines = read_input_file(args[0]);
 
-        boolean read_abd = false;
+        boolean read_concepts = false;
+        boolean read_individuals = false;
         boolean read_prefixes= false;
 
         for (String[] line: lines){
             String new_line = line[0].trim();
-            if (read_abd || read_prefixes){
+            if (read_concepts || read_individuals || read_prefixes){
                 if (new_line.equals("}")){
                     read_prefixes = false;
-                    read_abd = false;
-                } else if (read_abd){
-                    add_abd(new_line);
+                    read_concepts = false;
+                    read_individuals = false;
+                } else if (read_concepts) {
+                    add_abd(new_line, true);
+                } else if (read_individuals) {
+                    add_abd(new_line, false);
                 } else{
                     String last = (line.length == 2) ? line[1] : "";
                     add_prefix(new_line + " " + last);
@@ -47,8 +51,10 @@ public class ArgumentParser {
                     break;
                 case "-o:":
 //                    if (!next.matches("[a-zA-Z]+:[a-zA-Z]+")){
-                    if (!next.matches("(([a-zA-Z]+:)|(" + DLSyntax.IRI_REGEX + "#))[A-Z]{1}[a-z]*\\(" + "(([a-zA-Z]+:)|(" + DLSyntax.IRI_REGEX + "#))[a-z]+" + "\\)")){
-                        System.err.println("Observation " + next + " does not match the form A(a)");
+//                    if (!next.matches("(([a-zA-Z]+:)|(" + DLSyntax.IRI_REGEX + "#))[A-Z]{1}[a-z]*\\(" + "(([a-zA-Z]+:)|(" + DLSyntax.IRI_REGEX + "#))[a-z]+" + "\\)")){
+                    if (!next.matches("[a-zA-Z]+:[A-Z]{1}[a-z]*\\(" + "[a-zA-Z]+:[a-z]+" + "\\)")){
+                        System.err.println("Observation '" + next + "' does not match the form A(a) or " +
+                                "one of the prefixes is missing");
                         Application.finish(ExitCode.ERROR);
                     }
                     Configuration.OBSERVATION = next;
@@ -80,11 +86,18 @@ public class ArgumentParser {
                         Application.finish(ExitCode.ERROR);
                     }
                     break;
-                case "-a:":
+                case "-aI:":
                     if (next.equals("{")){
-                        read_abd = true;
+                        read_individuals = true;
                     } else {
-                        add_abd(next);
+                        add_abd(next, false);
+                    }
+                    break;
+                case "-aC:":
+                    if (next.equals("{")){
+                        read_concepts = true;
+                    } else {
+                        add_abd(next, true);
                     }
                     break;
                 case "-p:":
@@ -127,12 +140,15 @@ public class ArgumentParser {
         Configuration.PREFIXES.add(prefix);
     }
 
-    private void add_abd(String abd){
-        if (!abd.matches("[a-zA-Z]+:([a-zA-Z]+|[a-zA-Z]+\\(\\))|"+ DLSyntax.IRI_REGEX +"#([a-zA-Z]+|[a-zA-Z]+\\(\\))")){
-            System.err.println("Abductible " + abd + " does not match the form 'prefix_shortcut:individual/concept/property' nor 'prefix#individual/concept/property'");
-            Application.finish(ExitCode.ERROR);
-        }
-        Configuration.ABDUCIBLES.add(abd);
+    private void add_abd(String abd, boolean isConcept){
+//        if (!abd.matches("[a-zA-Z0-9]+:[a-zA-Z0-9]+")){
+//            System.err.println("Abductible '" + abd + "' does not match the form 'prefix_shortcut:individual/concept/property'");
+//            Application.finish(ExitCode.ERROR);
+//        }
+        if (isConcept)
+            Configuration.ABDUCIBLES_CONCEPTS.add(abd);
+        else
+            Configuration.ABDUCIBLES_INDIVIDUALS.add(abd);
     }
 
     private ArrayList<String[]> read_input_file(String input_file_path) {

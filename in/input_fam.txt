@@ -1,4 +1,4 @@
--f: C:\Users\gabli\Desktop\Diplomovka\hybrid_solver\files\family.owl
+-f: files/family.owl
 -o: fam:Father(fam:jack)
 -p: {
 fam: http://www.semanticweb.org/julia/ontologies/2017/8/family#

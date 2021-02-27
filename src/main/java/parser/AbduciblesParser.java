@@ -6,12 +6,17 @@ import common.Configuration;
 import common.DLSyntax;
 import common.Prefixes;
 import models.Abducibles;
+import org.apache.commons.lang3.StringUtils;
 import org.semanticweb.owlapi.model.*;
 import reasoner.Loader;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AbduciblesParser {
 
@@ -28,25 +33,36 @@ public class AbduciblesParser {
         Set<OWLNamedIndividual> individuals = new HashSet<>();
         Set<OWLObjectProperty> roles = new HashSet<>();
 
-        for (String abd: Configuration.ABDUCIBLES){
+        List<String> abducibles = Stream.of(Configuration.ABDUCIBLES_CONCEPTS,
+                Configuration.ABDUCIBLES_INDIVIDUALS).flatMap(x -> x.stream())
+                .collect(Collectors.toList());
+
+        for (String abd_string: abducibles){
             String[] prefix_obj;
 
-            if (!abd.contains(DLSyntax.DELIMITER_ONTOLOGY)){
-                prefix_obj = abd.split(DLSyntax.DELIMITER_ASSERTION);
+//            if (!abd.contains(DLSyntax.DELIMITER_ONTOLOGY)){
+            String abd;
+            if (Prefixes.prefixes.values().stream().anyMatch(abd_string::startsWith)){
+                abd = abd_string;
+            }
+            else{
+                prefix_obj = abd_string.split(DLSyntax.DELIMITER_ASSERTION);
                 if (!Prefixes.prefixes.containsKey(prefix_obj[0])){
-                    System.err.println("Prefix " + prefix_obj[0] + " in abducible -a " + abd + " is unknown, define the prefix with -p parameter.");
+                    System.err.println("Prefix " + prefix_obj[0] + " in abducible '" + abd_string + "' is unknown, define the prefix with -p parameter.");
                     Application.finish(ExitCode.ERROR);
                 }
                 abd = Prefixes.prefixes.get(prefix_obj[0]).concat(prefix_obj[1]);
             }
+//            }
 
-            prefix_obj = abd.split(DLSyntax.DELIMITER_ONTOLOGY);
-            if (Character.isUpperCase(prefix_obj[1].charAt(0))){
+//            prefix_obj = abd.split(DLSyntax.DELIMITER_ONTOLOGY);
+//            if (Character.isUpperCase(prefix_obj[1].charAt(0))){
+            if (Configuration.ABDUCIBLES_CONCEPTS.contains(abd_string)){
                 classes.add(create_class(abd));
             }
-            else if (prefix_obj[1].endsWith("()")){
-                roles.add(create_role(abd.substring(0, abd.length() - 2)));
-            }
+//            else if (prefix_obj[1].endsWith("()")){
+//                roles.add(create_role(abd.substring(0, abd.length() - 2)));
+//            }
             else{
                 individuals.add(create_individual(abd));
             }
@@ -56,9 +72,7 @@ public class AbduciblesParser {
         }
         Set<OWLNamedIndividual> observation_inds = loader.getObservation().getOwlAxiom().getIndividualsInSignature();
         for (OWLNamedIndividual ind: observation_inds){
-            if (!individuals.contains(ind)) {
-                individuals.add(ind);
-            }
+            individuals.add(ind);
         }
         return new Abducibles(loader, individuals, classes, roles);
     }
