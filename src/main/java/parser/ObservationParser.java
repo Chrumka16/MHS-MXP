@@ -46,10 +46,14 @@ public class ObservationParser implements IObservationParser {
         if (expressions[1].contains(DLSyntax.DELIMITER_OBJECT_PROPERTY)) {  // pre role, zatial netreba
             expression = parseObjectProperty(expressions);
         } else {
-            if (!expressions[1].contains(DLSyntax.DELIMITER_ONTOLOGY)){
+            if (!Prefixes.prefixes.values().stream().anyMatch(expressions[1]::startsWith)){
+                if (!expressions[1].contains(":")){
+                    System.err.println("Individual prefix in observation -o is unknown, define the prefix using -p parameter.");
+                    Application.finish(ExitCode.ERROR);
+                }
                 String[] prefix_obj = expressions[1].split(DLSyntax.DELIMITER_ASSERTION);
                 if (!Prefixes.prefixes.containsKey(prefix_obj[0])){
-                    System.err.println("Prefix " + prefix_obj[0] + " in observation -o is unknown, define the prefix with -p parameter.");
+                    System.err.println("Prefix " + prefix_obj[0] + " in observation -o is unknown, define the prefix using -p parameter.");
                     Application.finish(ExitCode.ERROR);
                 }
                 expressions[1] = Prefixes.prefixes.get(prefix_obj[0]).concat(prefix_obj[1]);
@@ -57,7 +61,11 @@ public class ObservationParser implements IObservationParser {
             namedIndividual = loader.getDataFactory().getOWLNamedIndividual(IRI.create(expressions[1]));
             loader.addNamedIndividual(namedIndividual);
 
-            if (!expressions[0].contains(DLSyntax.DELIMITER_ONTOLOGY)){
+            if (!Prefixes.prefixes.values().stream().anyMatch(expressions[0]::startsWith)){
+                if (!expressions[0].contains(":")){
+                    System.err.println("Concept prefix in observation -o is unknown, define the prefix using -p parameter.");
+                    Application.finish(ExitCode.ERROR);
+                }
                 String[] prefix_obj = expressions[0].split(DLSyntax.DELIMITER_ASSERTION);
                 if (!Prefixes.prefixes.containsKey(prefix_obj[0])){
                     System.err.println("Prefix " + prefix_obj[0] + " in observation -o is unknown, define the prefix with -p parameter.");

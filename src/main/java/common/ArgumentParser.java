@@ -52,9 +52,9 @@ public class ArgumentParser {
                 case "-o:":
 //                    if (!next.matches("[a-zA-Z]+:[a-zA-Z]+")){
 //                    if (!next.matches("(([a-zA-Z]+:)|(" + DLSyntax.IRI_REGEX + "#))[A-Z]{1}[a-z]*\\(" + "(([a-zA-Z]+:)|(" + DLSyntax.IRI_REGEX + "#))[a-z]+" + "\\)")){
-                    if (!next.matches("[a-zA-Z]+:[A-Z]{1}[a-z]*\\(" + "[a-zA-Z]+:[a-z]+" + "\\)")){
-                        System.err.println("Observation '" + next + "' does not match the form A(a) or " +
-                                "one of the prefixes is missing");
+//                    if (!next.matches("[a-zA-Z0-9]+:[A-Z]{1}[a-z0-9]*\\(" + "[a-zA-Z0-9]+:[a-zA-Z0-9]+" + "\\)")){
+                    if (!next.matches(".+\\(" + ".+" + "\\)")){
+                        System.err.println("Observation '" + next + "' does not match the form A(a)");
                         Application.finish(ExitCode.ERROR);
                     }
                     Configuration.OBSERVATION = next;
@@ -133,7 +133,7 @@ public class ArgumentParser {
     }
 
     private void add_prefix(String prefix){
-        if (!prefix.matches("[a-zA-Z]+: " + DLSyntax.IRI_REGEX)){
+        if (!prefix.matches("[a-zA-Z0-9]+: " + DLSyntax.IRI_REGEX)){
             System.err.println("Prefix '" + prefix + "' does not match the form 'prefix_shortcut: prefix'");
             Application.finish(ExitCode.ERROR);
         }
