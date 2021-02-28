@@ -693,6 +693,9 @@ public class HybridSolver implements ISolver {
             result.append(line);
             depth++;
         }
+        String line = String.format("%.2f\n", threadTimes.getTotalUserTimeInSec());
+        System.out.print(line);
+        result.append(line);
         log_explanations_times(minimalExplanations);
 
         FileLogger.appendToFile(FileLogger.HYBRID_LOG_FILE__PREFIX, currentTimeMillis, result.toString());
