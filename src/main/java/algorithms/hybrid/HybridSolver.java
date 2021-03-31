@@ -180,15 +180,16 @@ public class HybridSolver implements ISolver {
         while (!queue.isEmpty()) {
             TreeNode node = queue.poll();
 
-            if (Configuration.TIMEOUT != null && threadTimes.getTotalUserTimeInSec() > Configuration.TIMEOUT) {
-                showExplanationsWithDepth(currentDepth + 1, true);
-                currentDepth = null;
-                break;
-            }
-
             if (node.depth > currentDepth){
                 showExplanationsWithDepth(currentDepth, false);
                 currentDepth++;
+            }
+
+            if (Configuration.TIMEOUT != null && threadTimes.getTotalUserTimeInSec() > Configuration.TIMEOUT) {
+                System.out.println("timeout");
+                showExplanationsWithDepth(currentDepth + 1, true);
+                currentDepth = null;
+                break;
             }
 
             if (ModelNode.class.isAssignableFrom(node.getClass())) {
@@ -199,6 +200,9 @@ public class HybridSolver implements ISolver {
 
                 for (OWLAxiom child : model.data){
 
+//                    if (Configuration.TIMEOUT != null && threadTimes.getTotalUserTimeInSec() > Configuration.TIMEOUT) {
+//                        break;
+//                    }
                     if (model.label.contains(AxiomManager.getComplementOfOWLAxiom(loader, child)) ||
                             child.equals(loader.getObservation().getOwlAxiom())){
                         continue;
@@ -223,6 +227,12 @@ public class HybridSolver implements ISolver {
                     }
 
                     if (!REUSE_OF_MODELS || !usableModelInModels()) {
+                        if (Configuration.TIMEOUT != null && threadTimes.getTotalUserTimeInSec() > Configuration.TIMEOUT) {
+                            System.out.println("timeout");
+                            showExplanationsWithDepth(currentDepth + 1, true);
+                            currentDepth = null;
+                            return;
+                        }
                         if (REUSE_OF_MODELS && checkRules.isExplanation(explanation)){
                             explanation.setDepth(explanation.getOwlAxioms().size());
                             explanations.add(explanation);
@@ -303,6 +313,7 @@ public class HybridSolver implements ISolver {
         Literals conflictLiterals = new Literals();
         conflictLiterals.getOwlAxioms().addAll(conflictC1.getLiterals().getOwlAxioms());
         conflictLiterals.getOwlAxioms().addAll(conflictC2.getLiterals().getOwlAxioms());
+        int n = 0;
         while (!isOntologyWithLiteralsConsistent(conflictLiterals.getOwlAxioms())) {
             path.addAll(conflictC2.getLiterals().getOwlAxioms());
             Explanation X = getConflict(conflictC2.getLiterals().getOwlAxioms(), conflictC1.getLiterals());
@@ -432,12 +443,8 @@ public class HybridSolver implements ISolver {
                 modelNode.data.add(axiom);
             }
         }
-        lastUsableModelIndex = models.indexOf(modelNode);
-        if (!model.isEmpty() && lastUsableModelIndex == -1){
-            lastUsableModelIndex = models.size();
-            models.add(modelNode);
-        }
-        return getComplementOfModel(modelNode.data);
+        addModel(modelNode, getComplementOfModel(modelNode.data));
+        return negModels.get(lastUsableModelIndex);
     }
 
     private ModelNode getComplementOfModel(List<OWLAxiom> model) {
@@ -448,9 +455,9 @@ public class HybridSolver implements ISolver {
             negModel.add(complement);
         }
         negModelNode.data = negModel;
-        if (!negModel.isEmpty() && lastUsableModelIndex == negModels.size()) {
-            negModels.add(negModelNode);
-        }
+//        if (!negModel.isEmpty() && lastUsableModelIndex == negModels.size()) {
+//            addModel(negModelNode, true);
+//        }
         return negModelNode;
     }
 
@@ -574,10 +581,26 @@ public class HybridSolver implements ISolver {
         lastUsableModelIndex = models.indexOf(modelNode);
         if (!modelNode.data.isEmpty() && lastUsableModelIndex == -1) {
             lastUsableModelIndex = models.size();
-            models.add(modelNode);
-            negModels.add(negModelNode);
+            addModel(modelNode, negModelNode);
         }
         return negModelNode;
+    }
+
+    private void addModel(ModelNode model, ModelNode negModel){
+//        List<OWLAxiom> data = new ArrayList<>();
+//        for (OWLAxiom axiom: model.data){
+//            if (abd_literals.contains(axiom)){
+//                data.add(axiom);
+//            }
+//        }
+//        model.data = data;
+        lastUsableModelIndex = models.indexOf(model);
+        if (lastUsableModelIndex != -1 || model.data.isEmpty()){
+            return;
+        }
+        lastUsableModelIndex = models.size();
+        models.add(model);
+        negModels.add(negModel);
     }
 
     public static Set<OWLClassExpression> nodeClassSet2classExpSet(Set<Node<OWLClass>> nodeList) {

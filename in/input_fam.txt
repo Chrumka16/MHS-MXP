@@ -1,5 +1,6 @@
 -f: files/family.owl
 -o: fam:Father(fam:jack)
+-r: jfact
 -p: {
 fam: http://www.semanticweb.org/julia/ontologies/2017/8/family#
 }
