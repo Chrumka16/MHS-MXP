@@ -15,7 +15,6 @@ import java.util.Set;
 
 public class Abducibles {
 
-//    private Set<OWLAxiom> owlAxioms;
     private Set<OWLNamedIndividual> individuals;
     private Set<OWLClass> classes;
     private Set<OWLObjectProperty> roles;
@@ -61,7 +60,6 @@ public class Abducibles {
                     }
                     for (OWLObjectProperty op: roles){
                         axioms.add(loader.getDataFactory().getOWLObjectPropertyAssertionAxiom(op, ind, object));
-//                        axioms.add(loader.getDataFactory().getOWLObjectPropertyAssertionAxiom(op.get, ind, object));
                     }
                 }
             }
@@ -114,6 +112,6 @@ public class Abducibles {
     }
 
     public boolean noAbduciblesSpecified(){
-        return individuals.isEmpty() || (classes.isEmpty()); //&& roles.isEmpty());
+        return individuals.isEmpty() || (classes.isEmpty());
     }
 }

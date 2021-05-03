@@ -30,7 +30,6 @@ class PostfixNotation {
             possibleTokens.add(token);
         }
 
-        //String[] possibleTokens = expression.split(DLSyntax.DELIMITER_EXPRESSION);
         List<String> tokens = new ArrayList<>();
 
         for (int i = 0; i < possibleTokens.size(); i++) {

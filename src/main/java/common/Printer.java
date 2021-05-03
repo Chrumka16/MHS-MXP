@@ -14,7 +14,6 @@ public class Printer {
         if (owlAxiom instanceof OWLClassAssertionAxiom) {
             return Printer.getClassAssertionAxiom(owlAxiom).concat(DLSyntax.LEFT_PARENTHESES).
                     concat(Printer.getNamedIndividual(owlAxiom)).concat(DLSyntax.RIGHT_PARENTHESES);
-//            return Printer.getNamedIndividual(owlAxiom).concat(DLSyntax.DELIMITER_ASSERTION).concat(Printer.getClassAssertionAxiom(owlAxiom));
         }
         return Printer.getObjectPropertyAssertionAxiom(owlAxiom);
     }

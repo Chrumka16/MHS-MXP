@@ -58,8 +58,6 @@ public class FileLogger {
             directory.mkdirs();
         }
 
-//        String observation = Configuration.OBSERVATION.replaceAll("\\s+", "_").replaceAll(":", "-");
-//        String observation = observationToFilePath();
         return directoryPath.concat(File.separator).concat("" + currentTimeMillis + "__").concat(Configuration.INPUT_FILE_NAME + "__").concat(fileName).concat(LOG_FILE__POSTFIX);
     }
 

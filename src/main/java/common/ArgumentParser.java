@@ -50,9 +50,6 @@ public class ArgumentParser {
                     Configuration.INPUT_ONT_FILE = next;
                     break;
                 case "-o:":
-//                    if (!next.matches("[a-zA-Z]+:[a-zA-Z]+")){
-//                    if (!next.matches("(([a-zA-Z]+:)|(" + DLSyntax.IRI_REGEX + "#))[A-Z]{1}[a-z]*\\(" + "(([a-zA-Z]+:)|(" + DLSyntax.IRI_REGEX + "#))[a-z]+" + "\\)")){
-//                    if (!next.matches("[a-zA-Z0-9]+:[A-Z]{1}[a-z0-9]*\\(" + "[a-zA-Z0-9]+:[a-zA-Z0-9]+" + "\\)")){
                     if (!next.matches(".+\\(" + ".+" + "\\)")){
                         System.err.println("Observation '" + next + "' does not match the form A(a)");
                         Application.finish(ExitCode.ERROR);
@@ -141,10 +138,6 @@ public class ArgumentParser {
     }
 
     private void add_abd(String abd, boolean isConcept){
-//        if (!abd.matches("[a-zA-Z0-9]+:[a-zA-Z0-9]+")){
-//            System.err.println("Abductible '" + abd + "' does not match the form 'prefix_shortcut:individual/concept/property'");
-//            Application.finish(ExitCode.ERROR);
-//        }
         if (isConcept)
             Configuration.ABDUCIBLES_CONCEPTS.add(abd);
         else

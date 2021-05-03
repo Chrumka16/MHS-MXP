@@ -40,7 +40,6 @@ public class AbduciblesParser {
         for (String abd_string: abducibles){
             String[] prefix_obj;
 
-//            if (!abd.contains(DLSyntax.DELIMITER_ONTOLOGY)){
             String abd;
             if (Prefixes.prefixes.values().stream().anyMatch(abd_string::startsWith)){
                 abd = abd_string;
@@ -53,21 +52,15 @@ public class AbduciblesParser {
                 }
                 abd = Prefixes.prefixes.get(prefix_obj[0]).concat(prefix_obj[1]);
             }
-//            }
 
-//            prefix_obj = abd.split(DLSyntax.DELIMITER_ONTOLOGY);
-//            if (Character.isUpperCase(prefix_obj[1].charAt(0))){
             if (Configuration.ABDUCIBLES_CONCEPTS.contains(abd_string)){
                 classes.add(create_class(abd));
             }
-//            else if (prefix_obj[1].endsWith("()")){
-//                roles.add(create_role(abd.substring(0, abd.length() - 2)));
-//            }
             else{
                 individuals.add(create_individual(abd));
             }
         }
-        if (classes.isEmpty()){ //&& roles.isEmpty()){
+        if (classes.isEmpty()){
             return new Abducibles(loader);
         }
         Set<OWLNamedIndividual> observation_inds = loader.getObservation().getOwlAxiom().getIndividualsInSignature();

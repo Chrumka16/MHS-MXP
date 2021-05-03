@@ -99,9 +99,6 @@ public class ObservationParser implements IObservationParser {
             default:
                 break;
         }
-
-
-        //TODO test if nominal needs to be added to ontology as individual if it is not already in
     }
 
     private OWLExpression parseObjectProperty(String[] expressions) {
@@ -112,7 +109,6 @@ public class ObservationParser implements IObservationParser {
 
         loader.getOntologyManager().addAxiom(loader.getOntology(), loader.getDataFactory().getOWLDeclarationAxiom(subject));
         loader.getOntologyManager().addAxiom(loader.getOntology(), loader.getDataFactory().getOWLDeclarationAxiom(object));
-        // pridanie prefixu k roli? -> vytvorenie roly
         OWLObjectProperty objectProperty = loader.getDataFactory().getOWLObjectProperty(IRI.create(loader.getOntologyIRI().concat(DLSyntax.DELIMITER_ONTOLOGY).concat(expressions[1])));
 
         loader.addNamedIndividual(subject);

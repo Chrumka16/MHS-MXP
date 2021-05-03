@@ -162,7 +162,6 @@ public class HybridSolver implements ISolver {
             e.setDepth(e.getOwlAxioms().size());
         }
         explanations = conflict.getExplanations();
-//        showExplanationsWithDepth(1, false);
 
         ModelNode root = new ModelNode();
         if (usableModelInModels()){
@@ -200,9 +199,9 @@ public class HybridSolver implements ISolver {
 
                 for (OWLAxiom child : model.data){
 
-//                    if (Configuration.TIMEOUT != null && threadTimes.getTotalUserTimeInSec() > Configuration.TIMEOUT) {
-//                        break;
-//                    }
+                    if (Configuration.TIMEOUT != null && threadTimes.getTotalUserTimeInSec() > Configuration.TIMEOUT) {
+                        break;
+                    }
                     if (model.label.contains(AxiomManager.getComplementOfOWLAxiom(loader, child)) ||
                             child.equals(loader.getObservation().getOwlAxiom())){
                         continue;
@@ -275,7 +274,6 @@ public class HybridSolver implements ISolver {
         if (reasonerManager.isOntologyWithLiteralsConsistent(literals.getOwlAxioms(), ontology)) {
             return new Conflict();
         }
-//        abd_literals.removeLiterals(path); // nevraciam cestu naspat? mam ju vobec davat prec?
         return findConflicts(abd_literals);
     }
 
@@ -330,7 +328,7 @@ public class HybridSolver implements ISolver {
             conflictLiterals.getOwlAxioms().addAll(conflictC1.getLiterals().getOwlAxioms());
 
             if (explanations.contains(CS)) {
-                break;      // continue?
+                break;
             }
             explanations.add(CS);
         }
@@ -455,13 +453,10 @@ public class HybridSolver implements ISolver {
             negModel.add(complement);
         }
         negModelNode.data = negModel;
-//        if (!negModel.isEmpty() && lastUsableModelIndex == negModels.size()) {
-//            addModel(negModelNode, true);
-//        }
         return negModelNode;
     }
 
-    private ModelNode getNegModelByOntology(){
+    private ModelNode getNegModelByOntology(){  // mrozek
         ModelNode negModelNode = new ModelNode();
         List<OWLAxiom> negModel = new LinkedList<>();
         ModelNode modelNode = new ModelNode();
@@ -483,61 +478,42 @@ public class HybridSolver implements ISolver {
         Set<OWLAxiom> modelSet = new HashSet<>();
 
         for (OWLNamedIndividual ind : individualArray) {
-            /***********************
-             class assertion axioms
-             ***********************/
             if (!abducibles.getIndividuals().contains(ind)){
                 continue;
             }
 
-//            System.out.println(ind);
-
-            Set<OWLClassExpression> ontologyTypes =  //type assertions mentioned in ontology
+            Set<OWLClassExpression> ontologyTypes =
                     EntitySearcher.getTypes(ind, ontology).collect(toSet());
-            Set<OWLClassExpression> knownTypes = new HashSet<>(); //individual is of these types, according to ontology
-            Set<OWLClassExpression> knownNotTypes =  //individual is NOT of these types, according to ontology
+            Set<OWLClassExpression> knownTypes = new HashSet<>();
+            Set<OWLClassExpression> knownNotTypes =
                     new HashSet<>();
             for (OWLClassExpression exp : ontologyTypes) {
-                assert (exp.isClassExpressionLiteral()); // in case this assumption is not correct, we can remove it
-                //and uncomment the if (though it would mean we would be ignoring AND types
-                //if (exp.isClassExpressionLiteral()){
-                    /*
-                     We are ignoring more complex class expressions
-                     We should propably also consider AND
-                     */
+                assert (exp.isClassExpressionLiteral());
                 if (exp.isOWLClass()) {
-                    knownTypes.add((exp));	// ak to, co naslo, je OWLclass, tak to bolo typu jane:Mother
+                    knownTypes.add((exp));
                 } else {
-                    knownNotTypes.add(exp.getComplementNNF());	// inak to bolo typu jane:-Mother, teda -Mother nie je priamo OWLclass
+                    knownNotTypes.add(exp.getComplementNNF());
                 }
-                //}
             }
-            Set<OWLClassExpression> newNotTypes = //negated types in model but not in ontology
+            Set<OWLClassExpression> newNotTypes =
                     classSet2classExpSet(ontology.classesInSignature().collect(toSet()));
 
-            newNotTypes.remove(dfactory.getOWLThing()); // vrati Thing classu
+            newNotTypes.remove(dfactory.getOWLThing());
             newNotTypes.removeAll(knownNotTypes);
-            Set<OWLClassExpression> foundTypes = //non-negated types in model but not in ontology
+            Set<OWLClassExpression> foundTypes =
                     nodeClassSet2classExpSet(loader.getReasoner().getTypes(ind, false).getNodes());
 
             newNotTypes.removeAll(foundTypes);
             foundTypes.removeAll(knownTypes);
 
-            for (OWLClassExpression classExpression : foundTypes) {	// neguje ich, lebo hlada antimodel
+            for (OWLClassExpression classExpression : foundTypes) {
                 if (!abducibles.getClasses().contains(classExpression)){
                     continue;
                 }
                 OWLClassExpression negClassExp = classExpression.getComplementNNF();
                 OWLAxiom axiom = dfactory.getOWLClassAssertionAxiom(negClassExp, ind);
-//                System.out.println(axiom);
-//                System.out.println(abd_literals);
                 negModelSet.add(axiom);
                 modelSet.add(dfactory.getOWLClassAssertionAxiom(classExpression, ind));
-//                if (abd_literals.contains(axiom)) {
-//                    System.out.println("found");
-//                    System.out.println(ind);
-//                    System.out.println(axiom);
-//                }
             }
             for (OWLClassExpression classExpression : newNotTypes) {
                 if (!abducibles.getClasses().contains(classExpression)){
@@ -548,31 +524,6 @@ public class HybridSolver implements ISolver {
                 negModelSet.add(axiom);
                 modelSet.add(dfactory.getOWLClassAssertionAxiom(negClassExp, ind));
             }
-
-            /**********************
-             role assertion axioms
-             **********************/
-//            List<OWLObjectProperty> listOfRoles = //all roles mentioned in ontology
-//                    ontology.objectPropertiesInSignature().collect(Collectors.toList());
-//            for (OWLObjectProperty p : listOfRoles) {
-//                Set<OWLIndividual> knownRelated = EntitySearcher.getObjectPropertyValues(ind, p, ontology)
-//                        .collect(toSet());
-//                Set<OWLIndividual> unknownRelated =
-//                        loader.getReasoner().getObjectPropertyValues(ind, p).entities().collect(toSet());
-//                Set<OWLIndividual> notRelated = ontology.individualsInSignature().collect(toSet());
-//                notRelated.removeAll(unknownRelated);
-//                unknownRelated.removeAll(knownRelated);
-//                if (!Config.loopsAllowed) {
-//                    unknownRelated.remove(ind);
-//                    notRelated.remove(ind);
-//                }
-//                for (OWLIndividual relatedInd : unknownRelated) {
-//                    toReturn.add(dfactory.getOWLNegativeObjectPropertyAssertionAxiom(p, ind, relatedInd));
-//                }
-//                for (OWLIndividual unrelatedInd : notRelated) {
-//                    toReturn.add(dfactory.getOWLObjectPropertyAssertionAxiom(p, ind, unrelatedInd));
-//                }
-//            }
         }
 
         removeAxiomsFromOntology(path);
@@ -587,13 +538,6 @@ public class HybridSolver implements ISolver {
     }
 
     private void addModel(ModelNode model, ModelNode negModel){
-//        List<OWLAxiom> data = new ArrayList<>();
-//        for (OWLAxiom axiom: model.data){
-//            if (abd_literals.contains(axiom)){
-//                data.add(axiom);
-//            }
-//        }
-//        model.data = data;
         lastUsableModelIndex = models.indexOf(model);
         if (lastUsableModelIndex != -1 || model.data.isEmpty()){
             return;
@@ -604,17 +548,14 @@ public class HybridSolver implements ISolver {
     }
 
     public static Set<OWLClassExpression> nodeClassSet2classExpSet(Set<Node<OWLClass>> nodeList) {
-        //node is returned from reasoner model
         Set<OWLClassExpression> toReturn = new HashSet<>();
         for (Node<OWLClass> node : nodeList) {
-            //node
             toReturn.addAll(node.getEntitiesMinusTop());
         }
         return toReturn;
     }
 
     public static Set<OWLClassExpression> classSet2classExpSet(Set<OWLClass> classSet) {
-        //transforms each class into (superclass) class expression
         Set<OWLClassExpression> toReturn = new HashSet<>();
         toReturn.addAll(classSet);
         return toReturn;
@@ -643,13 +584,10 @@ public class HybridSolver implements ISolver {
                 explanations.add(conflict);
             }
         }
-//        literals.removeLiterals(lenghtOneExplanations);
-//        boolean allExplanationsFound = literals.getOwlAxioms().size() <= 1;
-//        literals.addLiterals(lenghtOneExplanations);
         if (newExplanations.size() == this.lenghtOneExplanations.size()){
             return false;
         }
-        return !newExplanations.isEmpty(); // && !allExplanationsFound;
+        return !newExplanations.isEmpty();
     }
 
     private boolean isOntologyWithLiteralsConsistent(Collection<OWLAxiom> axioms){
