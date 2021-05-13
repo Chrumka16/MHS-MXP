@@ -140,7 +140,7 @@ public class HybridSolver implements ISolver {
         abd_literals = new Literals(to_abd);
         if (abd_literals.getOwlAxioms().isEmpty()){
             if (Configuration.NEGATION_ALLOWED){
-                abd_literals = literals;        // ok??
+                abd_literals = literals;
             }
             else{
                 abd_literals.addLiterals(assertionsAxioms);
@@ -225,6 +225,13 @@ public class HybridSolver implements ISolver {
                         continue;
                     }
 
+                    if (checkRules.isExplanation(explanation)){ // zmenila som
+                        explanation.setDepth(explanation.getOwlAxioms().size());
+                        explanations.add(explanation);
+                        path.clear();
+                        continue;
+                    }
+
                     if (!REUSE_OF_MODELS || !usableModelInModels()) {
                         if (Configuration.TIMEOUT != null && threadTimes.getTotalUserTimeInSec() > Configuration.TIMEOUT) {
                             System.out.println("timeout");
@@ -232,16 +239,13 @@ public class HybridSolver implements ISolver {
                             currentDepth = null;
                             return;
                         }
-                        if (REUSE_OF_MODELS && checkRules.isExplanation(explanation)){
-                            explanation.setDepth(explanation.getOwlAxioms().size());
-                            explanations.add(explanation);
-                            path.clear();
-                            continue;
-                        }
                         if (!addNewExplanations()){
                             path.clear();
                             continue;
                         }
+                    }
+                    else{
+                        lenghtOneExplanations = new ArrayList<>();
                     }
 
                     ModelNode modelNode = new ModelNode();
@@ -256,7 +260,7 @@ public class HybridSolver implements ISolver {
                     }
                     modelNode.depth = model.depth + 1;
                     modelNode.add_node_explanations(model);
-                    modelNode.add_to_explanations(lenghtOneExplanations);
+                    modelNode.add_to_explanations(lenghtOneExplanations);       // TU JE CHYBA?
                     queue.add(modelNode);
                     path.clear();
                 }
@@ -311,7 +315,7 @@ public class HybridSolver implements ISolver {
         Literals conflictLiterals = new Literals();
         conflictLiterals.getOwlAxioms().addAll(conflictC1.getLiterals().getOwlAxioms());
         conflictLiterals.getOwlAxioms().addAll(conflictC2.getLiterals().getOwlAxioms());
-        int n = 0;
+
         while (!isOntologyWithLiteralsConsistent(conflictLiterals.getOwlAxioms())) {
             path.addAll(conflictC2.getLiterals().getOwlAxioms());
             Explanation X = getConflict(conflictC2.getLiterals().getOwlAxioms(), conflictC1.getLiterals());
@@ -458,7 +462,6 @@ public class HybridSolver implements ISolver {
 
     private ModelNode getNegModelByOntology(){  // mrozek
         ModelNode negModelNode = new ModelNode();
-        List<OWLAxiom> negModel = new LinkedList<>();
         ModelNode modelNode = new ModelNode();
         modelNode.data = new LinkedList<>();
 
